@@ -6,13 +6,15 @@
       range-separator="至"
       start-placeholder="开始日期"
       end-placeholder="结束日期"
-      align="right"
+
       size="medium"
       popper-class="date-box"
       :default-time="defaultTime"
       :shortcuts="shortcuts"
     >
     </el-date-picker>
+<!--      -->
+<!--      align="right"-->
   </div>
 </template>
 

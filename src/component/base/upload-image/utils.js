@@ -49,9 +49,10 @@ export function isEmptyObj(data) {
   return JSON.stringify(data) === '{}'
 }
 
-/** 生成随机字符串 */
+/** 生成不重复随机字符串 */
 export function createId() {
-  return Math.random()
+    //添加时间戳保证唯一性
+    return Date.now().toString(36)+Math.random()
     .toString(36)
     .substring(2)
 }

@@ -8,8 +8,32 @@
     <div class="wrap">
       <el-row>
         <el-col :lg="16" :md="20" :sm="24" :xs="24">
-            <s-form @submit="submitForm"
-                    :data="book" :list="list" :config="{rules}"></s-form>
+          <el-form :model="king" status-icon ref="form" label-width="100px" @submit.prevent :rules="rules">
+            <el-form-item label="书名" prop="title">
+              <el-input size="medium" v-model="king.title" placeholder="请填写书名"></el-input>
+            </el-form-item>
+            <el-form-item label="作者" prop="author">
+              <el-input size="medium" v-model="king.author" placeholder="请填写作者"></el-input>
+            </el-form-item>
+            <el-form-item label="封面" prop="image">
+              <el-input size="medium" v-model="king.image" placeholder="请填写封面地址"></el-input>
+            </el-form-item>
+            <el-form-item label="简介" prop="summary">
+              <el-input
+                size="medium"
+                type="textarea"
+                :autosize="{ minRows: 4, maxRows: 8 }"
+                placeholder="请输入简介"
+                v-model="king.summary"
+              >
+              </el-input>
+            </el-form-item>
+
+            <el-form-item class="submit">
+              <el-button type="primary" @click="submitForm">保 存</el-button>
+              <el-button @click="resetForm">重 置</el-button>
+            </el-form-item>
+          </el-form>
         </el-col>
       </el-row>
     </div>
@@ -17,10 +41,9 @@
 </template>
 
 <script>
-import { reactive, ref, onMounted ,defineAsyncComponent } from 'vue'
+import { reactive, ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import bookModel from '@/model/book'
-import sForm from '@/component/form'
+import bookModel from '@/model/king'
 
 export default {
   props: {
@@ -29,34 +52,10 @@ export default {
       default: null,
     },
   },
-    components:{
-        sForm
-    },
   setup(props, context) {
-      const list=[
-          {
-              label:'书名',
-              prop:'title',
-          },
-          {
-              label:'作者',
-              prop:'medium',
-          },
-          {
-              label:'封面',
-              prop:'image',
-              type:'image',
-              dataType:'string'
-          },
-          {
-              label:'简介',
-              prop:'summary',
-              type:'1'
-          }
-      ]
     const form = ref(null)
     const loading = ref(false)
-    const book = reactive({ id:'',title: '', author: '', summary: '', image: '' })
+    const king = reactive({ title: '', author: '', summary: '', image: '' })
 
     const listAssign = (a, b) => Object.keys(a).forEach(key => {
       a[key] = b[key] || a[key]
@@ -76,20 +75,34 @@ export default {
     const getBook = async () => {
       loading.value = true
       const res = await bookModel.getBook(props.editBookId)
-      listAssign(book, res)
+      listAssign(king, res)
       loading.value = false
     }
+
+    // 重置表单
+    const resetForm = () => {
+      form.value.resetFields()
+    }
+
     const submitForm = async formName => {
-        let res = {}
-        if (props.editBookId) {
-            res = await bookModel.editBook(props.editBookId, book)
+      form.value.validate(async valid => {
+        if (valid) {
+          let res = {}
+          if (props.editBookId) {
+            res = await bookModel.editBook(props.editBookId, king)
             context.emit('editClose')
-        } else {
-            res = await bookModel.createBook(book)
-        }
-        if (res.code < window.MAX_SUCCESS_CODE) {
+          } else {
+            res = await bookModel.createBook(king)
+            resetForm(formName)
+          }
+          if (res.code < window.MAX_SUCCESS_CODE) {
             ElMessage.success(`${res.message}`)
+          }
+        } else {
+          console.error('error submit!!')
+          ElMessage.error('请将信息填写完整')
         }
+      })
     }
 
     const back = () => {
@@ -97,11 +110,11 @@ export default {
     }
 
     return {
-        list,
       back,
-      book,
+      king,
       form,
       rules,
+      resetForm,
       submitForm,
     }
   },

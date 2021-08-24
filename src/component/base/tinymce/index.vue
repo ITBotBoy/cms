@@ -10,7 +10,7 @@ import { post } from '@/lin/plugin/axios'
 export default {
   name: 'TinymceEditor',
   props: {
-    defaultContent: {
+    value: {
       type: String,
       default: '',
     },
@@ -76,19 +76,19 @@ export default {
     }
   },
   mounted() {
-    if (this.defaultContent) {
-      this.content = this.defaultContent
+    if (this.value) {
+      this.content = this.value
     }
   },
   watch: {
     content: {
       handler() {
-        this.$emit('change', this.content)
+        this.$emit('update:value', this.content)
       },
     },
-    defaultContent: {
+    value: {
       handler() {
-        this.content = this.defaultContent
+        this.content = this.value
       },
       immediate: true,
     },

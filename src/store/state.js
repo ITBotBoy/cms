@@ -20,5 +20,5 @@ export default {
   },
 
   sidebarLevel: appConfig.sidebarLevel || 3,
-  defaultRoute: appConfig.defaultRoute || '/about',
+  defaultRoute: appConfig.defaultRoute || '/dashboard',
 }

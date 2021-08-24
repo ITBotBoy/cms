@@ -7,7 +7,6 @@ import '@/config/global'
 import 'lin/plugin'
 import { filters } from 'lin/filter'
 import permissionDirective from 'lin/directive/authorize'
-
 import App from '@/app.vue'
 import store from '@/store'
 import router from '@/router'
@@ -20,6 +19,8 @@ import SourceCode from '@/component/base/source-code/source-code'
 import '@/assets/style/index.scss'
 import 'element-plus/lib/theme-chalk/index.css'
 import '@/assets/style/realize/element-variable.scss'
+//Added non-passive event listener to a scroll-blocking 'wheel' event
+
 
 const app = createApp(App)
 
