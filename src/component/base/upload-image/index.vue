@@ -232,7 +232,6 @@ const defaultConfig = {
     /** 每一项高度 */
     height: 160,
     /** 是否禁用, 禁用后只可展示 不可进行编辑操作, 包括: 新增, 修改, 删除, 改变顺序 */
-    disabled: false,
     /** 最少图片数量 */
     minNum: 1,
     /** 最多图片数量, 0 表示无限制 */
@@ -274,6 +273,9 @@ export default {
             type: Object,
             default: defaultConfig,
         },
+        disabled: {
+            type: Boolean,
+        },
         /** 初始化数据 */
         value: {
             type: [Array, String],
@@ -284,11 +286,9 @@ export default {
             return Object.assign(defaultConfig, this.config || {})
         },
         /** 每项容器样式 */
-        disabled() {
-            return this.configC.disabled
-        },
         boxStyle() {
-            const {width, height, disabled} = this.configC
+            const {width, height} = this.configC
+            const disabled = this.disabled
             const style = {}
             if (typeof width === 'number') {
                 style.width = `${width}px`

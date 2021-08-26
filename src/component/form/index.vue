@@ -9,7 +9,6 @@
         @submit.prevent
         :rules="configC.rules"
     >
-<!--        inline智能宽度，默认2个-->
         <div v-for="i in list" :key="i.prop" :class="i.inline && 'inlineItem'"
              :style="{width:typeof(i.width)==='number'?`${i.width}px`:i.width || (i.inline && '50%')}">
             <el-form-item
@@ -18,39 +17,30 @@
                 :label="i.label" :prop="i.prop">
                 <slot v-if="i.prepend" :name="`${i.prop}_prepend`"></slot>
                 <slot :name="i.prop">
-                    <!-- type ,显示隐藏判断
-
-            input:0,undefined
-            textarea:1,textarea
-
-            el-radio:2,radio
-            必选：options,buttonOptions,
-            可选：config{label:'name',value:'id',border,dataType:'string'}
-
-            el-checkbox:3,checkbox
-            必选：options,buttonOptions
-            可选：config{label:'name',value:'id',border,dataType:'string'}
-
-            s-editor:config {}自行封装扩展
-            s-image:config {domain:'',src:'image',dataType:'string'}自行封装扩展，不是绝对路径必传此参数
-            -->
-                    <!-- dataType [0,'0','string'] [1,'1','array']              -->
                     <el-input
                         v-if="[...typeIn[0], ...typeIn[1]].includes(i.type)"
                         :type="typeIn[0].includes(i.type) ? 'text' : 'textarea'"
-                        v-model="data[i.prop]"
+                        :value="getState(i.prop)"
+                        :disabled="i.disabled"
+                        @input="e=>setState(e,i.prop)"
                         :placeholder="i.placeholder || `请输入${i.label}`"
                     ></el-input>
                     <el-select
+                        :disabled="i.disabled"
                         :placeholder="i.placeholder || `请选择${i.label}`"
-                        clearable v-else-if="typeIn[2].includes(i.type)" v-model="data[i.prop]">
+                        clearable v-else-if="typeIn[2].includes(i.type)"
+                        :value="getState(i.prop)"
+                        @input="e=>setState(e,i.prop)">
                         <el-option :key="index"
                                    v-for="(j, index) in (i.options || i.buttonOptions)"
                                    :value="j[i.config?i.config.value || 'value':'value']"
                                    :label="j[i.config?i.config.label || 'label':'label']"></el-option>
                     </el-select>
                     <el-radio-group
-                        v-else-if="typeIn[3].includes(i.type)" v-model="data[i.prop]">
+                        :disabled="i.disabled"
+                        v-else-if="typeIn[3].includes(i.type)"
+                        :value="getState(i.prop)"
+                        @input="e=>setState(e,i.prop)">
                         <template v-if="i.options">
                             <!-- vue2不支持 i.config?.value || 'value'/!!i.config?.border -->
                             <el-radio
@@ -74,7 +64,10 @@
                         </template>
                     </el-radio-group>
                     <el-checkbox-group
-                        v-else-if="typeIn[4].includes(i.type)" v-model="data[i.prop]">
+                        :disabled="i.disabled"
+                        v-else-if="typeIn[4].includes(i.type)"
+                        :value="getArrayState(i.prop,i.dataType)"
+                        @input="e=>setArrayState(e,i.prop,i.dataType)">
                         <template v-if="i.options">
                             <el-checkbox
                                 :key="index"
@@ -96,15 +89,13 @@
                             </el-checkbox-button>
                         </template>
                     </el-checkbox-group>
-                    <!--
-            注意：
-            :value.sync【vue2】
-            v-model:value【vue3】
-            -->
+                    <!--注意：:value.sync【vue2】，v-model:value【vue3】-->
                     <s-image
+                        :disabled="i.disabled"
                         :config="i.config" v-model:value="data[i.prop]"
                         v-else-if="typeIn[5].includes(i.type)"></s-image>
                     <s-editor
+                        :disabled="i.disabled"
                         :config="i.config" v-model:value="data[i.prop]" v-else></s-editor>
                 </slot>
                 <slot v-if="i.append" :name="`${i.prop}_append`"></slot>
@@ -121,13 +112,15 @@
 </template>
 <!--兼容vue2.0,vue3.0-->
 <!--UI，数据分离，loading禁用-->
+<!--split设置-->
 <script>
-
+    import get from 'lodash/get'
+    import set from 'lodash/set'
+    import isArray from 'lodash/isArray'
     import bookModel from '@/model/book'
     import sEditor from '@/component/base/tinymce'
     import sImage from '@/component/base/upload-image'
     import {ElMessage} from 'element-plus'
-
     const defaultConfig = {
         size: 'medium',
         statusIcon: true,
@@ -143,6 +136,10 @@
         },
         data() {
             return {
+                dataTypeIn:Object.freeze([
+                    [0, undefined, 'string', '0'],
+                    ['array', 1, '1'],
+                ]),
                 typeIn: Object.freeze([
                     [0, undefined, 'text', '0'],
                     ['textarea', 1, '1'],
@@ -155,6 +152,30 @@
             }
         },
         computed: {
+            //防止xss注入和数据处理
+            getArrayState(){
+                return (prop,dataType)=>{
+                    if(this.dataTypeIn[0].includes(dataType)){
+                        let v=get(this.data,prop)
+                        if(isArray(v)){
+                            return v
+                        }else {
+                            return v.split(',')
+                        }
+                    }
+                }
+            },
+            setArrayState(){
+                return (value,prop,dataType)=>{
+                    set(this.data,prop,value.join(','))
+                }
+            },
+            getState(){
+                return prop=>get(this.data,prop)
+            },
+            setState(){
+                return (value,prop)=>set(this.data,prop,value)
+            },
             configC() {
                 return Object.assign(defaultConfig, this.config || {})
             },

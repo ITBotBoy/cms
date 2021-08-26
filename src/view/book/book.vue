@@ -54,7 +54,7 @@ export default {
             {
                 label: '简介',
                 prop: 'summary',
-                type: '1',
+                type: 'editor',
             },
         ]
         const form = ref(null)
