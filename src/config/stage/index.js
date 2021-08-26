@@ -36,7 +36,7 @@ let homeRouter = [
     icon: 'iconfont icon-rizhiguanli',
   },
   bookConfig,
-    kingConfig,
+  kingConfig,
   adminConfig,
 ]
 

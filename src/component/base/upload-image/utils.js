@@ -51,10 +51,13 @@ export function isEmptyObj(data) {
 
 /** 生成不重复随机字符串 */
 export function createId() {
-    //添加时间戳保证唯一性
-    return Date.now().toString(36)+Math.random()
-    .toString(36)
-    .substring(2)
+  // 添加时间戳保证唯一性
+  return (
+    Date.now().toString(36)
+    + Math.random()
+      .toString(36)
+      .substring(2)
+  )
 }
 
 /**

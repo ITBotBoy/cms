@@ -1,3 +1,5 @@
+> 基于[lin-cms-vue](https://github.com/TaleLin/lin-cms-vue)上传组件进行二次封装,以贴近项目实际使用时的解决方案
+
 # 多图上传
 
 多图片上传组件 `UploadImgs`, 附有预览, 排序, 验证等功能 [演示效果](http://face.cms.7yue.pro/#/imgs-upload/stage1)
@@ -10,63 +12,43 @@
 - 内置支持 Lin-CMS 上传接口
 
 ## 基础示例
-
-```vue
-<upload-imgs ref="uploadEle" :value="initData" />
-
-<script>
-import UploadImgs from "@/component/base/upload-imgs";
-
-export default {
-  components: {
-    UploadImgs
-  },
-  data() {
-    return {
-      rules: {
-        minWidth: 100,
-        minHeight: 100,
-        maxSize: 5
-      },
-      initData: []
-    };
-  },
-  methods: {
-    getValue() {
-      this.$refs.uploadEle.getValue();
-    }
-  }
-};
-</script>
-```
-
-### 初始化说明
-
-初始化时传入数组, 如果初始化为空则传入空数组 `[]`, 如果已经存在内容, 内容结构要求如下:
-
-|  属性   |     类型      | 是否必填 |             说明              |
-| :-----: | :-----------: | :------: | :---------------------------: |
-|   id    | String/Nuber  |    否    | 初始化数据的 id, 推荐有该数据 |
-|  imgId  | String/Number |    否    |          图像资源 id          |
-|   src   |    String     |    否    |         图像相对地址          |
-| display |    String     |    是    |    图像完整地址, 用于展示     |
+>此组件已内置于`s-form`组件中，无特殊配置不必关心此组件的使用方法；默认值minNum,maxNum默认值修改为1，或自行封装`s-image`组件
 
 示例:
-
-```js
-const initData = [{
-  id: '12d3',
-  display: 'http://img-home.7yue.pro/images/index/Lin_cms_%E5%B0%81%E9%9D%A2.png',
-  src: '/images/index/Lin_cms_%E5%B0%81%E9%9D%A2.png',
-  imgId: '238287',
-}, {
-  id: '17qr',
-  display: 'http://img-home.7yue.pro/images/index/Lin_UI_%E5%B0%81%E9%9D%A2.png',
-  src: '/images/index/Lin_UI_%E5%B0%81%E9%9D%A2.png',
-  imgId: '1232323',
-}];
+```vue
+<s-image :value.sync="book.images" :config="item.config"></s-image>
+<!--vue3使用方法:.sync替换为v-model：-->
+<!--<s-image v-model:value="data[i.prop]"></s-image>-->
+<script>
+import sImage from '@/component/base/upload-image'
+export default {
+    components: {
+        sImage
+    },
+    data() {
+        return {
+            item:{
+                label:'封面',
+                prop:'images',
+                config:{dataType:'array',domain:'http://img-home.7yue.pro',src:'url'},
+            }
+            book: {
+                id: '',
+                title: '',
+                author: '',
+                images: [{
+                    id: '1',
+                    url: '/images/index/Lin_cms_%E5%B0%81%E9%9D%A2.png',
+                }, {
+                    id: '2',
+                    url: '/images/index/Lin_UI_%E5%B0%81%E9%9D%A2.png',
+                }];
+            };
+        }
+    }
+}
+</script>
 ```
-
 ### 返回值说明
 
 新上传的图像会有完整的图像信息
@@ -75,7 +57,7 @@ const initData = [{
 | :--------: | :-----------: | :--: | :---------------------------------------------------: |
 |     id     | String/Nuber  | null |                    初始化数据的 id                    |
 |   imgId    | String/Number | null |                      图像资源 id                      |
-|    src     |    String     | null |                     图像相对地址                      |
+|    src     |    String     | null |                     参数为config配置的参数名，不传默认src，图像相对地址                      |
 |  display   |    String     | null |                     图像完整地址                      |
 |   width    |    Number     | null |                       图像宽度                        |
 |   height   |    Number     | null |                       图像高度                        |
@@ -120,7 +102,7 @@ const initData = [{
 |    maxSize    |    Number    | null |                                            最大 size（Mb）                                            |
 | allowAnimated |    Number    | null | 是否允许上传动图, 0 不检测, 1 不允许动图, 2 只允许动图. 要检查此项, 需设置属性 animated-check 为 true |
 
-默认值为 `{ maxSize: 2 }` 图片文件大小限制 2M 内. 这与 lin-cms 服务端文件上传接口默认限制一致
+默认值为 `{ maxSize: 5 }` 图片文件大小限制 5M 内. 这与 lin-cms 服务端文件上传接口默认限制一致
 
 ## methods
 

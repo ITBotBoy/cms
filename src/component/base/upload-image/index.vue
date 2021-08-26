@@ -226,41 +226,41 @@ const uploadLimit = 10
 let catchData = []
 /** for originUpload: 计时器缓存 */
 let time
-const defaultConfig={
+const defaultConfig = {
     /** 每一项宽度 */
-    width:160,
+    width: 160,
     /** 每一项高度 */
-    height:160,
+    height: 160,
     /** 是否禁用, 禁用后只可展示 不可进行编辑操作, 包括: 新增, 修改, 删除, 改变顺序 */
-    disabled:false,
+    disabled: false,
     /** 最少图片数量 */
-    minNum:1,
+    minNum: 1,
     /** 最多图片数量, 0 表示无限制 */
-    maxNum:1,
+    maxNum: 1,
 
-    multiple:false,
-    autoUpload:true,
-    sortable:false,
-    accept:'image/*',
-    preview:true,
-    fit:'cover',
-    animatedCheck:false,
-    beforeUploadMethod:null,
-    uploadMethod:null,
-    dataType:'string',
-    src:'src',
-    domain:'',
-    rules: () => ({})
+    multiple: false,
+    autoUpload: true,
+    sortable: false,
+    accept: 'image/*',
+    preview: true,
+    fit: 'contain',
+    animatedCheck: false,
+    beforeUploadMethod: null,
+    uploadMethod: null,
+    dataType: 'string',
+    src: 'src',
+    domain: '',
+    rules: () => ({maxSize: 5}),
 }
-const dataType=[
-    [0,'0',undefined,'string'],
-    ['array','1',1]
+const dataType = [
+    [0, '0', undefined, 'string'],
+    ['array', '1', 1],
 ]
 export default {
     name: 'UploadImgs',
     data() {
         return {
-            flag:false,
+            flag: false,
             srcList: [],
             itemList: [],
             imageRefs: [],
@@ -270,9 +270,9 @@ export default {
         }
     },
     props: {
-        config:{
-            type:Object,
-            default:defaultConfig
+        config: {
+            type: Object,
+            default: defaultConfig,
         },
         /** 初始化数据 */
         value: {
@@ -280,11 +280,11 @@ export default {
         },
     },
     computed: {
-        configC(){
-            return Object.assign(defaultConfig,this.config || {})
+        configC() {
+            return Object.assign(defaultConfig, this.config || {})
         },
         /** 每项容器样式 */
-        disabled(){
+        disabled() {
             return this.configC.disabled
         },
         boxStyle() {
@@ -367,36 +367,36 @@ export default {
             return max !== 0 && min === max
         },
         /** 是否可以一次多选 */
-        multiple(){
+        multiple() {
             return this.configC.multiple
         },
-        autoUpload(){
+        autoUpload() {
             return this.configC.autoUpload
         },
-        sortable(){
+        sortable() {
             return this.configC.sortable
         },
-        accept(){
+        accept() {
             return this.configC.accept
         },
         /** 是否可预览 */
-        preview(){
+        preview() {
             return this.configC.preview
         },
         /** 图像显示模式 */
-        fit(){
+        fit() {
             return this.configC.fit
         },
         /** 检测是否是动图 */
-        animatedCheck(){
+        animatedCheck() {
             return this.configC.animatedCheck
         },
         /** 上传前插入方法, 属于高级用法 */
-        beforeUpload(){
+        beforeUpload() {
             return this.configC.beforeUploadMethod
         },
         /** 重写上传方法, 如果重写则覆盖组件内上传方法 */
-        uploadMethod(){
+        uploadMethod() {
             return this.configC.uploadMethod
         },
         /** 构造图像规范提示 */
@@ -461,50 +461,49 @@ export default {
 
             return tips
         },
-        /*valueC:{
-            // 初始化数据
-            get(){
-                console.log(this.value)
-                this.initItemList(this.value)
-            },
-            set(val){
-                let value=this.initItemList(val)
-                if(dataType[1].includes(this.dataType)){
-                    if(this.value.some(i=>typeof(i)!=='object' || !i?.display)){
-                        value=value.map(i=>this.domain?i.src:i.display)
-                    }else {
-                        value=value.reduce((arr,i)=>{
-                            let obj={};
-                            obj[this.src]=this.domain?i.src:i.display
-                            arr.push(obj)
-                            return arr
-                        },[])
+        /* valueC:{
+                // 初始化数据
+                get(){
+                    console.log(this.value)
+                    this.initItemList(this.value)
+                },
+                set(val){
+                    let value=this.initItemList(val)
+                    if(dataType[1].includes(this.dataType)){
+                        if(this.value.some(i=>typeof(i)!=='object' || !i?.display)){
+                            value=value.map(i=>this.domain?i.src:i.display)
+                        }else {
+                            value=value.reduce((arr,i)=>{
+                                let obj={};
+                                obj[this.src]=this.domain?i.src:i.display
+                                arr.push(obj)
+                                return arr
+                            },[])
+                        }
+                    }else{
+                        value=value.map(i=>this.domain?i.src:i.display).join(',')
                     }
-                }else{
-                    value=value.map(i=>this.domain?i.src:i.display).join(',')
+                    this.$emit('update:value',value)
                 }
-                this.$emit('update:value',value)
-            }
-        },*/
+            }, */
     },
-    watch:{
-        value(v){
+    watch: {
+        value(v) {
             this.initItemList(v)
-        }
+        },
     },
     mounted() {
         this.initItemList()
     },
-    //注意：移动删除等均会触发getValue
+    // 注意：移动删除等均会触发getValue
     methods: {
-        formatItem(v){
-            if(typeof(v)==="object"){
-                let display=this.domain+v[this.src]
-                return createItem({display,src:v[this.src]})
-            }else {
-                let display=this.domain+v
-                return createItem({display,src:v})
+        formatItem(v) {
+            if (typeof v === 'object') {
+                const display = this.domain + v[this.src]
+                return createItem({display, src: v[this.src]})
             }
+            const display = this.domain + v
+            return createItem({display, src: v})
         },
         /**
          * 上传缓存中的图片
@@ -742,23 +741,22 @@ export default {
             })
             // 获取数据成功后发出
             // this.$emit('upload', result)
-            let value=result;
-            if(dataType[1].includes(this.dataType)){
-                if(this.value.some(i=>typeof(i)!=='object' || !i?.display)){
-                    value=value.map(i=>this.domain?i.src:i.display)
-                }else {
-                    value=value.reduce((arr,i)=>{
-                        let obj=i;
-                        obj[this.src]=this.domain?i.src:i.display
+            let value = result
+            if (dataType[1].includes(this.dataType)) {
+                if (this.value.some(i => typeof i !== 'object' || !i?.display)) {
+                    value = value.filter(i => i.display).map(i => (this.domain ? i.src : i.display))
+                } else {
+                    value = value.filter(i => i.display).reduce((arr, i) => {
+                        const obj = i
+                        obj[this.src] = this.domain ? i.src : i.display
                         arr.push(obj)
                         return arr
-                    },[])
+                    }, [])
                 }
-            }else{
-                value=value.map(i=>this.domain?i.src:i.display).join(',')
+            } else {
+                value = value.filter(i => i.display).map(i => (this.domain ? i.src : i.display)).join(',')
             }
-            console.log(value)
-            this.$emit('update:value',value)
+            this.$emit('update:value', value)
             return result
         },
         /**
@@ -1032,14 +1030,12 @@ export default {
         initItemList(val) {
             const {max, isStable, disabled} = this
             const result = []
-            //val为字符串返回字符串，为数组则返回数组
-            if(val && (typeof(val)==='string' || val.some(i=>typeof(i)!=='object' || !i?.display))){
-                if(Array.isArray(val) || dataType[1].includes(this.dataType)){
-                    val=val.map(v=>this.formatItem(v))
-                }else{
-                    if(val){
-                        val=(val || '').split(',').map(v=>this.formatItem(v))
-                    }
+            // val为字符串返回字符串，为数组则返回数组
+            if (val && (typeof val === 'string' || val.some(i => typeof i !== 'object' || !i?.display))) {
+                if (Array.isArray(val) || dataType[1].includes(this.dataType)) {
+                    val = val.map(v => this.formatItem(v))
+                } else if (val) {
+                    val = (val || '').split(',').map(v => this.formatItem(v))
                 }
             }
             // 初始值不存在情况
@@ -1069,7 +1065,6 @@ export default {
                 result.push(createItem())
             }
             this.itemList = result
-
         },
         /**
          * 获取图像信息
