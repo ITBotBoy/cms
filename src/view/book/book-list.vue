@@ -6,7 +6,7 @@
         <div class="title">图书列表</div>
       </div>
       <!-- 表格 -->
-      <s-table :data="books" :loading="loading" :list="list">
+      <s-table @sort-change="sortChange" :data="books" :loading="loading" :list="list">
         <template #operate="scope">
           <el-button plain size="mini" type="primary" @click="handleEdit(scope.row.id)">编辑</el-button>
           <el-button
@@ -32,8 +32,10 @@ import { ElMessageBox, ElMessage } from 'element-plus'
 import bookModel from '@/model/book'
 import sTable from '@/component/table'
 import BookModify from './book'
+import tableMixin from '@/mixins/table'
 
 export default {
+  mixins: [tableMixin],
   components: {
     BookModify,
     sTable,
@@ -43,6 +45,8 @@ export default {
       {
         label: '书名',
         prop: 'title',
+        sortable: true,
+        search: true,
       },
       {
         label: '作者',
@@ -116,6 +120,7 @@ export default {
       handleDelete,
     }
   },
+  methods: {},
 }
 </script>
 
